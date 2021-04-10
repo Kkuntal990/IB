@@ -78,6 +78,6 @@ if(args.loadpath):
 else:
     VIB = VIBNet(dr,BETA,classes,prior)
     VIB.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
-history = VIB.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epoch, batch_size=args.BatchSize)
+history = VIB.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epochs, batch_size=args.BatchSize)
 VIB.predict(X_test)
 VIB.save(args.savepath)
