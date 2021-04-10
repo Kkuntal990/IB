@@ -54,7 +54,7 @@ parser.add_argument('--Beta',type=float, default = 1e-3, help='IB Ratio' )
 parser.add_argument('--Prior_Mean',type=float, default = 0, help='Mean of Prior')
 parser.add_argument('--Prior_Sigma',type=float, default = 1.0, help='Sigma of Prior')
 parser.add_argument("--dropout", type=float, default=0.5, help='DropoutRatio')
-parser.add_argument("--savepath", type=Str, default="checkpoint", help='Save Model Path')
+parser.add_argument("--savepath", type=str, default="checkpoint", help='Save Model Path')
 args = parser.parse_args()
 
 PATH = args.Path
