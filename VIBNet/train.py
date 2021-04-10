@@ -14,7 +14,7 @@ def to_onehot(yy):
         return yy1
 
 def load_data(PATH):
-    with open("RML2016.10a_dict.dat", 'rb') as xd1:  
+    with open(PATH, 'rb') as xd1:  
         Xd = pickle.load(xd1, encoding='latin1')  # , encoding='latin1'
         snrs, mods = map(lambda j: sorted(
             list(set(map(lambda x: x[j], Xd.keys())))), [1, 0])
@@ -54,6 +54,7 @@ parser.add_argument('--Beta',type=float, default = 1e-3, help='IB Ratio' )
 parser.add_argument('--Prior_Mean',type=float, default = 0, help='Mean of Prior')
 parser.add_argument('--Prior_Sigma',type=float, default = 1.0, help='Sigma of Prior')
 parser.add_argument("--dropout", type=float, default=0.5, help='DropoutRatio')
+parsel.add_argument("--savepath", type=Str, default="checkpoint", help='Save Model Path')
 args = parser.parse_args()
 
 PATH = args.Path

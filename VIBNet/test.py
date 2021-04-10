@@ -16,7 +16,7 @@ def to_onehot(yy):
         return yy1
 
 def load_data(PATH):
-    with open("RML2016.10a_dict.dat", 'rb') as xd1:  
+    with open(PATH, 'rb') as xd1:  
         Xd = pickle.load(xd1, encoding='latin1')  # , encoding='latin1'
         snrs, mods = map(lambda j: sorted(
             list(set(map(lambda x: x[j], Xd.keys())))), [1, 0])
