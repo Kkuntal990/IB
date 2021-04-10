@@ -50,10 +50,14 @@ def load_data(PATH):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--Path', type=str , help='Path to Dataset')
+parser.add_argument('--epochs', type=int,default=1000, help='Epochs')
+parser.add_argument('--lr',type=float, default = 5e-4, help='Learning Rate' )
+parser.add_argument('--BatchSize', type=int,default=1024, help='Batch Size')
 parser.add_argument('--Beta',type=float, default = 1e-3, help='IB Ratio' )
 parser.add_argument('--Prior_Mean',type=float, default = 0, help='Mean of Prior')
 parser.add_argument('--Prior_Sigma',type=float, default = 1.0, help='Sigma of Prior')
 parser.add_argument("--dropout", type=float, default=0.5, help='DropoutRatio')
+parser.add_argument("--loadpath", type=str, default=None, help='Load Model Path')
 parser.add_argument("--savepath", type=str, default="checkpoint", help='Save Model Path')
 args = parser.parse_args()
 
@@ -68,8 +72,12 @@ print(in_shp)
 BETA = args.Beta
 prior = ds.Normal(args.Prior_Mean, args.Prior_Sigma)
 dr = args.dropout
-VIB = VIBNet(dr,BETA,classes,prior)
-VIB.compile(optimizer=tf.keras.optimizers.Adam(lr=5e-4), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
-history = VIB.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=10000, batch_size=1024)
+
+if(args.loadpath):
+    VIB = tf.keras.models.load_model(args.loadpath)
+else:
+    VIB = VIBNet(dr,BETA,classes,prior)
+    VIB.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
+history = VIB.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epoch, batch_size=args.BatchSize)
 VIB.predict(X_test)
-VIB.save("checkpoint")
+VIB.save(args.savepath)
