@@ -22,6 +22,7 @@ def AdversarialCompare(PATH, model1,model2,SNR_Filter):
         print(in_shp)
         eps = np.linspace(0,3e-3,10)
         OP = []
+      
         for __ in eps:
             X_Adv = fast_gradient_method(VIB, X_test, __, np.inf)
             Y_pred = np.argmax(VIB(X_Adv),axis=1)
@@ -44,7 +45,7 @@ def AdversarialCompare(PATH, model1,model2,SNR_Filter):
             print(co)
             OP2.append(co/len(X_test))
 
-        return eps,OP1,OP2
+        return eps,OP,OP2
         
 
                 
