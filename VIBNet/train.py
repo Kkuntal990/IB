@@ -9,7 +9,7 @@ import tensorflow as tf
 from tensorflow_probability import distributions as ds
 from VIBNET import VIBNet
 from load_dataset import load_data
-
+from CNN import CNN
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--Path', type=str , help='Path to Dataset')
@@ -22,6 +22,7 @@ parser.add_argument('--Prior_Sigma',type=float, default = 1.0, help='Sigma of Pr
 parser.add_argument("--dropout", type=float, default=0.5, help='DropoutRatio')
 parser.add_argument("--loadpath", type=str, default=None, help='Load Model Path')
 parser.add_argument("--savepath", type=str, default="checkpoint", help='Save Model Path')
+parser.add_argument("--model_type", type=str, default="VIB", help='Model Type \n1.VIB - VIBNet \n2.CNN - CNN')
 args = parser.parse_args()
 
 PATH = args.Path
@@ -37,10 +38,16 @@ prior = ds.Normal(args.Prior_Mean, args.Prior_Sigma)
 dr = args.dropout
 
 if(args.loadpath):
+    
     VIB = tf.keras.models.load_model(args.loadpath)
 else:
-    VIB = VIBNet(dr,BETA,classes,prior)
-    VIB.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
+    if(args.model_type=="VIB"):
+        VIB = VIBNet(dr,BETA,classes,prior)
+        VIB.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
+    else:
+        VIB = CNN(dr,classes)
+
+
 history = VIB.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epochs, batch_size=args.BatchSize)
 VIB.predict(X_test)
 VIB.save(args.savepath)
