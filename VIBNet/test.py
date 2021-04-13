@@ -59,6 +59,8 @@ def load_data(PATH):
 parser = argparse.ArgumentParser()
 parser.add_argument('--Path', type=str , help='Path to Dataset')
 parser.add_argument('--SNR',type=float, default = None, help='SNR Filter' )
+parser.add_argument('--LoadPath',type=str, default = None, help='Load Model Path' )
+
 
 args = parser.parse_args()
 SNR_filter = args.SNR
@@ -71,7 +73,7 @@ print(Y_train.shape, Y_test.shape)
 classes = mods
 print(in_shp)
 
-VIB = tf.keras.models.load_model('checkpoint')
+VIB = tf.keras.models.load_model(args.LoadPath)
 eps = np.linspace(0,3e-3,10)
 OP = []
 for __ in eps:
