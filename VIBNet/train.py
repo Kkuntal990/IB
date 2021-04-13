@@ -26,7 +26,7 @@ args = parser.parse_args()
 
 PATH = args.Path
 
-X_train, X_test, Y_train, Y_test,mod_train, mod_test, mods = load_data(PATH)
+X_train, X_test, Y_train, Y_test, mods = load_data(PATH)
 in_shp = list(X_train.shape[1:])
 print(X_train.shape, X_test.shape)
 print(Y_train.shape, Y_test.shape)

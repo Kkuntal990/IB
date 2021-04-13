@@ -16,7 +16,6 @@ def load_data(PATH):
     X = []
     lbl = []
     SNR = []
-    modu = []
     k = 0
     for mod in mods:
         k += 1
@@ -24,11 +23,9 @@ def load_data(PATH):
             SNR.append(snr)
             X.append(Xd[(mod, snr)])
             for i in range(Xd[(mod, snr)].shape[0]):
-                modu.append(k)
                 lbl.append((mod, snr))
     X = np.vstack(X)
     np.random.seed(2016)  
-    modu = np.array(modu)
     n_examples = X.shape[0]
     n_train = n_examples * 0.5  # ĺŻšĺ
     train_idx = np.random.choice(
@@ -36,15 +33,13 @@ def load_data(PATH):
     test_idx = list(set(range(0, n_examples)) - set(train_idx))  # label
     test_idx2 = []
     X_train = X[train_idx]
-    mod_train = modu[train_idx]
 
     for i in test_idx:
         if SNR[i//1000] >= 0:
             test_idx2.append(i)
     
     X_test = X[test_idx2]
-    mod_test = modu[test_idx2]
     trainy = list(map(lambda x: mods.index(lbl[x][0]), train_idx))
     Y_train = to_onehot(trainy)
     Y_test = to_onehot(list(map(lambda x: mods.index(lbl[x][0]), test_idx2)))
-    return X_train, X_test, Y_train, Y_test, mod_train, mod_test, mods
+    return X_train, X_test, Y_train, Y_test, mods
