@@ -17,6 +17,7 @@ parser.add_argument('--SNR',type=float, default = None, help='SNR Filter' )
 parser.add_argument('--LoadPath',type=str, default = None, help='Load Model Path' )
 
 
+
 args = parser.parse_args()
 SNR_filter = args.SNR
 PATH = args.Path
@@ -33,7 +34,7 @@ eps = np.linspace(0,3e-3,10)
 OP = []
 for __ in eps:
   X_Adv = fast_gradient_method(VIB, X_test, __, np.inf)
-  Y_pred = np.argmax(VIB(X_test),axis=1)
+  Y_pred = np.argmax(VIB(X_Adv),axis=1)
   Y_test2 = np.argmax(Y_test,axis=1)
   co = 0
   for i in range(len(X_test)):

@@ -8,7 +8,7 @@ def to_onehot(yy):
         yy1[np.arange(len(yy)), yy] = 1
         return yy1
 
-def load_data(PATH):
+def load_data(PATH, SNR_Filter=list(range(21))):
     with open(PATH, 'rb') as xd1:  
         Xd = pickle.load(xd1, encoding='latin1')  # , encoding='latin1'
         snrs, mods = map(lambda j: sorted(
@@ -35,7 +35,7 @@ def load_data(PATH):
     X_train = X[train_idx]
 
     for i in test_idx:
-        if SNR[i//1000] >= 0:
+        if SNR[i//1000] in SNR_Filter:
             test_idx2.append(i)
     
     X_test = X[test_idx2]
