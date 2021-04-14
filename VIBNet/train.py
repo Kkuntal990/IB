@@ -38,7 +38,6 @@ prior = ds.Normal(args.Prior_Mean, args.Prior_Sigma)
 dr = args.dropout
 
 if(args.loadpath):
-    
     VIB = tf.keras.models.load_model(args.loadpath)
 else:
     if(args.model_type=="VIB"):
@@ -47,6 +46,7 @@ else:
     else:
         VIB = CNN(dr,classes)
 
+print(VIB.summary)
 
 history = VIB.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epochs, batch_size=args.BatchSize)
 VIB.predict(X_test)
