@@ -25,24 +25,24 @@ def CNN(dr,classes):
 
 def LSTM(dr, classes):
     input_x = tf.keras.layers.Input(shape=(2, 128,))
-    input_x = tf.keras.layers.Reshape(target_shape=(1, 2, 128,))(input_x)
+    input_x = tf.keras.layers.Reshape(target_shape=(( 2, 128,1)))(input_x)
     # input_x_padding = tf.keras.layers.ZeroPadding2D(
     #     (0, 2), data_format="channels_first")(input_x)
 
     layer11 = tf.keras.layers.Conv2D(50, (1, 8), padding='same', activation="relu", name="conv11", kernel_initializer='glorot_uniform',
-                    data_format="channels_first")(input_x)
+                    )(input_x)
     layer11 = tf.keras.layers.Dropout(dr)(layer11)
 
     # layer11_padding = tf.keras.layers.ZeroPadding2D(
     #     (0, 2), data_format="channels_first")(layer11)
     layer12 = tf.keras.layers.Conv2D(50, (1, 8), padding="same", activation="relu", name="conv12", kernel_initializer='glorot_uniform',
-                    data_format="channels_first")(layer11)
+                    )(layer11)
     layer12 = tf.keras.layers.Dropout(dr)(layer12)
 
     # layer12 = tf.keras.layers.ZeroPadding2D(
     #     (0, 2), data_format="channels_first")(layer12)
     layer13 = tf.keras.layers.Conv2D(50, (1, 8), padding='same', activation="relu", name="conv13", kernel_initializer='glorot_uniform',
-                    data_format="channels_first")(layer12)
+                    )(layer12)
     layer13 = tf.keras.layers.Dropout(dr)(layer13)
 
     # <type 'tuple'>: (None, 50, 2, 242),
