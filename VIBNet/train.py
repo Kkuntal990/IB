@@ -6,7 +6,7 @@ from load_dataset import load_data
 from CNN import CNN
 
 parser = argparse.ArgumentParser()
-parser.add_argument('Path', type=str , help='Path to Dataset')
+parser.add_argument('--Path', type=str , help='Path to Dataset')
 parser.add_argument('--epochs', type=int,default=1000, help='Epochs')
 parser.add_argument('--lr',type=float, default = 5e-4, help='Learning Rate' )
 parser.add_argument('--BatchSize', type=int,default=1024, help='Batch Size')

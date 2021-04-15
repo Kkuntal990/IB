@@ -123,26 +123,28 @@ class VIBNet(tf.keras.Model):
 
 class LSTM_VIB(tf.keras.Model):
     def __init__(self, dr, BETA, classes, prior, **kwargs):
-        super(VIBNet, self).__init__(**kwargs)
+        super(LSTM_VIB, self).__init__(**kwargs)
 
         self.BETA = BETA
         self.prior = prior
         self.classes = classes
         inp = tf.keras.Input(shape=(2, 128,))
         x = tf.keras.layers.Reshape(target_shape=(2, 128, 1,))(inp)
-        x = tf.keras.layers.ZeroPadding2D(
-            (0, 2), data_format="channels_first")(x)
-        x = tf.keras.layers.Conv2D(50, (1, 8), padding='valid', activation="relu",
+        # x = tf.keras.layers.ZeroPadding2D(
+        #     (0, 2))(x)
+        print(x.shape)
+        x = tf.keras.layers.Conv2D(50, (1, 8), padding='same', activation="relu",
                                    name="conv1", kernel_initializer='glorot_uniform')(x)
+        print(x.shape)
         x1 = tf.keras.layers.Dropout(dr)(x)
-        x2 = tf.keras.layers.ZeroPadding2D(
-            (0, 2), data_format="channels_first")(x1)
-        x2 = tf.keras.layers.Conv2D(50, (1, 8), padding="valid", activation="relu",
-                                    name="conv2", kernel_initializer='glorot_uniform')(x)2
+        # x2 = tf.keras.layers.ZeroPadding2D(
+        #     (0, 2))(x1)
+        x2 = tf.keras.layers.Conv2D(50, (1, 8), padding="same", activation="relu",
+                                    name="conv2", kernel_initializer='glorot_uniform')(x1)
         x2 = tf.keras.layers.Dropout(dr)(x2)
-        x2 = tf.keras.layers.ZeroPadding2D(
-            (0, 2), data_format="channels_first")(x2)
-        x3 = tf.keras.layers.Conv2D(50, (1, 8), padding="valid", activation="relu",
+        # x2 = tf.keras.layers.ZeroPadding2D(
+        #     (0, 2))(x2)
+        x3 = tf.keras.layers.Conv2D(50, (1, 8), padding="same", activation="relu",
                                     name="conv3", kernel_initializer='glorot_uniform')(x2)
         x3 = tf.keras.layers.Dropout(dr)(x3)
         concat = tf.keras.layers.concatenate([x1, x3])
@@ -153,7 +155,7 @@ class LSTM_VIB(tf.keras.Model):
         lstm_out = tf.keras.layers.LSTM(50, input_dim=input_dim,
                                         input_length=timesteps)(concat)
         dense1 = tf.keras.layers.Dense(256, activation='relu',
-                                       init='he_normal', name="dense1")(lstm_out)
+                                       kernel_initializer='he_normal', name="dense1")(lstm_out)
 
         '''
         mu = Dense(128, activation='relu', name="mu")(x)
