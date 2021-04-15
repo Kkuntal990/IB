@@ -39,7 +39,7 @@ else:
         model = LSTM_VIB(dr, BETA, classes, prior)
         model.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
     elif (args.model_type=="LSTM"):
-        model = LSTM(dr, BETA, classes, prior)
+        model = LSTM(dr, classes)
         model.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
     
     
