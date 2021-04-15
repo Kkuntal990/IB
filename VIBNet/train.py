@@ -1,7 +1,7 @@
 import argparse
 import tensorflow as tf
 from tensorflow_probability import distributions as ds
-from VIBNET import VIBNet
+from VIBNET import VIBNet, LSTM_VIB
 from load_dataset import load_data
 from CNN import CNN
 
@@ -34,6 +34,9 @@ if(args.loadpath):
 else:
     if(args.model_type=="VIB"):
         model = VIBNet(dr,BETA,classes,prior)
+        model.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
+    elif (args.model_type=="LSTM_VIB"):
+        model = LSTM_VIB(dr, BETA, classes, prior)
         model.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
     else:
         model = CNN(dr,classes)

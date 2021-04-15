@@ -2,7 +2,7 @@ import tensorflow
 tf = tensorflow
 from tensorflow_probability import distributions as ds
 import math
-
+import numpy as np
 class VIBNet(tf.keras.Model):
     def __init__(self,dr,BETA,classes,prior, **kwargs):
         super(VIBNet, self).__init__(**kwargs)

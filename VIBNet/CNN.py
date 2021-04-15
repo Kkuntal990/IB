@@ -22,3 +22,5 @@ def CNN(dr,classes):
     model.compile(loss='categorical_crossentropy', optimizer='adam',metrics = [tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
     return model
 
+def LSTM(dr, classes):
+    
