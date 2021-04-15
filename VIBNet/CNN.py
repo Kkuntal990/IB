@@ -24,8 +24,8 @@ def CNN(dr,classes):
     return model
 
 def LSTM(dr, classes):
-    input_x = tf.keras.layers.Input(shape=(2, 128,))
-    input_x = tf.keras.layers.Reshape(target_shape=(( 2, 128,1)))(input_x)
+    inp = tf.keras.layers.Input(shape=(2, 128,))
+    input_x = tf.keras.layers.Reshape(target_shape=(( 2, 128,1)))(inp)
     # input_x_padding = tf.keras.layers.ZeroPadding2D(
     #     (0, 2), data_format="channels_first")(input_x)
 
@@ -61,7 +61,7 @@ def LSTM(dr, classes):
                         name="dense2")(layer_dropout)
     layer_softmax = tf.keras.layers.Activation('softmax')(layer_dense2)
     output = tf.keras.layers.Reshape([len(classes)])(layer_softmax)
-    model = tf.keras.Model(input_x, output)
+    model = tf.keras.Model(inp, output)
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=[
                   tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
     return model
