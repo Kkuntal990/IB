@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow_probability import distributions as ds
 from VIBNET import VIBNet, LSTM_VIB
 from load_dataset import load_data
-from CNN import CNN
+from CNN import CNN, LSTM
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--Path', type=str , help='Path to Dataset')
@@ -38,6 +38,11 @@ else:
     elif (args.model_type=="LSTM_VIB"):
         model = LSTM_VIB(dr, BETA, classes, prior)
         model.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
+    elif (args.model_type=="LSTM"):
+        model = LSTM(dr, BETA, classes, prior)
+        model.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
+    
+    
     else:
         model = CNN(dr,classes)
         model.compile(loss='categorical_crossentropy', optimizer='adam',metrics = [tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
