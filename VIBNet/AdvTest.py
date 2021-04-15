@@ -1,8 +1,5 @@
-from sklearn.metrics import cohen_kappa_score, accuracy_score
-from sklearn.metrics import confusion_matrix
 from cleverhans.tf2.attacks.projected_gradient_descent import projected_gradient_descent
 from cleverhans.tf2.attacks.fast_gradient_method import fast_gradient_method
-import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
@@ -10,7 +7,7 @@ import tensorflow as tf
 from tensorflow_probability import distributions as ds
 from load_dataset import load_data
 
-def AdversarialCompare(PATH, model1,model2,SNR_Filter):
+def AdversarialCompare(PATH, model1,model2,SNR_Filter=list(range(19)),max_eps=1e-3):
     
         VIB = tf.keras.models.load_model(model1)
         CNN = tf.keras.models.load_model(model2)
@@ -48,4 +45,21 @@ def AdversarialCompare(PATH, model1,model2,SNR_Filter):
         return eps,OP,OP2
         
 
-                
+parser = argparse.ArgumentParser()
+parser.add_argument('Path', type=str , help='Path to Dataset')
+parser.add_argument('--SNR',type=list, default = list(range(19)), help='SNR Filter' )
+parser.add_argument('--VIBPath',type=str, default = None, help='VIB Model Path' )
+parser.add_argument('--CNNPath',type=str, default = None, help='CNN Model Path' )
+parser.add_argument('--max_eps', type=float, default = 1e-3, help='Maximum EPSilon' )   
+args = parser.parse_args()
+
+VIB = tf.keras.models.load_model(args.VIBPath)
+CNN = tf.keras.models.load_model(args.CNNPath)
+eps,x,y = AdversarialCompare(args.PATH, VIB,CNN,args.SNR,args.max_eps)
+plt.plot(eps,x,label="VIB")
+plt.plot(eps,y, label="CNN")
+plt.xlabel("Epsilon")
+plt.ylabel("Accuracy")
+plt.legend()
+plt.title("FGSM")
+plt.show()
