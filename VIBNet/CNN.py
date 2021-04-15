@@ -61,7 +61,7 @@ def LSTM(dr, classes):
                         name="dense2")(layer_dropout)
     layer_softmax = tf.keras.layers.Activation('softmax')(layer_dense2)
     output = tf.keras.layers.Reshape([len(classes)])(layer_softmax)
-    model = tf.keras.Model(input, output)
+    model = tf.keras.Model(input_x, output)
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=[
                   tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
     return model
