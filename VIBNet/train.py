@@ -40,14 +40,15 @@ else:
         model.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
     elif (args.model_type=="LSTM"):
         model = LSTM(dr, classes)
-        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=[
+        model.compile(loss='categorical_crossentropy', optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[
                    tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
-
-    
     else:
         model = CNN(dr,classes)
-        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=[
+        model.compile(loss='categorical_crossentropy', optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[
                    tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
-history = model.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epochs, batch_size=args.BatchSize)
-model.predict(X_test)
-model.save(args.savepath)
+
+checkpoint = tf.keras.callbacks.ModelCheckpoint(args.savepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+callbacks_list = [checkpoint]
+history = model.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epochs, batch_size=args.BatchSize, callbacks=callbacks_list)
+# model.predict(X_test)
+# model.save(args.savepath)
