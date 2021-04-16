@@ -1,15 +1,9 @@
-from sklearn.metrics import cohen_kappa_score, accuracy_score
-from sklearn.metrics import confusion_matrix
-import sys
-import pickle
-import matplotlib.pyplot as plt
-import numpy as np
 import argparse
 import tensorflow as tf
 from tensorflow_probability import distributions as ds
-from VIBNET import VIBNet
+from VIBNET import VIBNet, LSTM_VIB
 from load_dataset import load_data
-from CNN import CNN
+from CNN import CNN, LSTM
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--Path', type=str , help='Path to Dataset')
@@ -28,26 +22,33 @@ args = parser.parse_args()
 PATH = args.Path
 
 X_train, X_test, Y_train, Y_test, mods = load_data(PATH)
-in_shp = list(X_train.shape[1:])
 print(X_train.shape, X_test.shape)
 print(Y_train.shape, Y_test.shape)
 classes = mods
-print(in_shp)
 BETA = args.Beta
 prior = ds.Normal(args.Prior_Mean, args.Prior_Sigma)
 dr = args.dropout
 
 if(args.loadpath):
-    VIB = tf.keras.models.load_model(args.loadpath)
+    model = tf.keras.models.load_model(args.loadpath)
 else:
     if(args.model_type=="VIB"):
-        VIB = VIBNet(dr,BETA,classes,prior)
-        VIB.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
+        model = VIBNet(dr,BETA,classes,prior)
+        model.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
+    elif (args.model_type=="LSTM_VIB"):
+        model = LSTM_VIB(dr, BETA, classes, prior)
+        model.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
+    elif (args.model_type=="LSTM"):
+        model = LSTM(dr, classes)
+        model.compile(loss='categorical_crossentropy', optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[
+                   tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
     else:
-        VIB = CNN(dr,classes)
+        model = CNN(dr,classes)
+        model.compile(loss='categorical_crossentropy', optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[
+                   tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
 
-print(VIB.summary)
-
-history = VIB.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epochs, batch_size=args.BatchSize)
-VIB.predict(X_test)
-VIB.save(args.savepath)
+checkpoint = tf.keras.callbacks.ModelCheckpoint(args.savepath, monitor='val_categorical_accuracy', verbose=1, save_best_only=True, mode='max')
+callbacks_list = [checkpoint]
+history = model.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epochs, batch_size=args.BatchSize, callbacks=callbacks_list)
+# model.predict(X_test)
+# model.save(args.savepath)

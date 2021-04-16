@@ -1,5 +1,6 @@
 
 import tensorflow
+import numpy as np
 tf = tensorflow
 
 def CNN(dr,classes):
@@ -21,4 +22,50 @@ def CNN(dr,classes):
     model.add(tf.keras.layers.Reshape([len(classes)]))
     model.compile(loss='categorical_crossentropy', optimizer='adam',metrics = [tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
     return model
+
+def LSTM(dr, classes):
+    inp = tf.keras.layers.Input(shape=(2, 128,))
+    input_x = tf.keras.layers.Reshape(target_shape=(( 2, 128,1)))(inp)
+    # input_x_padding = tf.keras.layers.ZeroPadding2D(
+    #     (0, 2), data_format="channels_first")(input_x)
+
+    layer11 = tf.keras.layers.Conv2D(50, (1, 8), padding='same', activation="relu", name="conv11", kernel_initializer='glorot_uniform',
+                    )(input_x)
+    layer11 = tf.keras.layers.Dropout(dr)(layer11)
+
+    # layer11_padding = tf.keras.layers.ZeroPadding2D(
+    #     (0, 2), data_format="channels_first")(layer11)
+    layer12 = tf.keras.layers.Conv2D(50, (1, 8), padding="same", activation="relu", name="conv12", kernel_initializer='glorot_uniform',
+                    )(layer11)
+    layer12 = tf.keras.layers.Dropout(dr)(layer12)
+
+    # layer12 = tf.keras.layers.ZeroPadding2D(
+    #     (0, 2), data_format="channels_first")(layer12)
+    layer13 = tf.keras.layers.Conv2D(50, (1, 8), padding='same', activation="relu", name="conv13", kernel_initializer='glorot_uniform',
+                    )(layer12)
+    layer13 = tf.keras.layers.Dropout(dr)(layer13)
+
+    # <type 'tuple'>: (None, 50, 2, 242),
+    concat = tf.keras.layers.concatenate([layer11, layer13])
+    concat_size = list(np.shape(concat))
+    input_dim = int(concat_size[-1] * concat_size[-2])
+    timesteps = int(concat_size[-3])
+    concat = tf.keras.layers.Reshape((timesteps, input_dim))(concat)
+    lstm_out = tf.keras.layers.LSTM(
+        50, input_dim=input_dim, input_length=timesteps)(concat)
+
+    layer_dense1 = tf.keras.layers.Dense(256, activation='relu',
+                        kernel_initializer='he_normal', name="dense1")(lstm_out)
+    layer_dropout = tf.keras.layers.Dropout(dr)(layer_dense1)
+    layer_dense2 = tf.keras.layers.Dense(len(classes), kernel_initializer='he_normal',
+                        name="dense2")(layer_dropout)
+    output = tf.keras.layers.Activation('softmax')(layer_dense2)
+    
+    model = tf.keras.Model(inp, output)
+    model.summary()
+    
+    # model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=[
+    #               tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
+    return model
+
 
