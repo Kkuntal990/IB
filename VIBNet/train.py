@@ -47,7 +47,7 @@ else:
         model.compile(loss='categorical_crossentropy', optimizer=tf.keras.optimizers.Adam(lr=args.lr), metrics=[
                    tf.keras.metrics.CategoricalAccuracy(name='categorical_accuracy')])
 
-checkpoint = tf.keras.callbacks.ModelCheckpoint(args.savepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+checkpoint = tf.keras.callbacks.ModelCheckpoint(args.savepath, monitor='val_categorical_accuracy', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 history = model.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epochs, batch_size=args.BatchSize, callbacks=callbacks_list)
 # model.predict(X_test)
