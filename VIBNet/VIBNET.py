@@ -116,7 +116,7 @@ class VIBNet(tf.keras.Model):
         self.val_loss_tracker.update_state(val_loss)
         self.val_acc_tracker.update_state(val_acc)
         return {
-            "acc" : self.val_acc_tracker.result(),
+            "categorical_accuracy" : self.val_acc_tracker.result(),
             "loss" : self.val_loss_tracker.result()
         }
 
@@ -260,6 +260,6 @@ class LSTM_VIB(tf.keras.Model):
         self.val_loss_tracker.update_state(val_loss)
         self.val_acc_tracker.update_state(val_acc)
         return {
-            "acc": self.val_acc_tracker.result(),
+            "categorical_accuracy": self.val_acc_tracker.result(),
             "loss": self.val_loss_tracker.result()
         }
