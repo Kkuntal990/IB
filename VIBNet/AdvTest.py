@@ -17,7 +17,7 @@ def AdversarialCompare(PATH, model1,model2,SNR_Filter=list(range(19)),max_eps=1e
         print(Y_train.shape, Y_test.shape)
         classes = mods
         print(in_shp)
-        eps = np.linspace(0,3e-3,10)
+        eps = np.linspace(0,max_eps,10)
         OP = []
       
         for __ in eps:
@@ -44,22 +44,3 @@ def AdversarialCompare(PATH, model1,model2,SNR_Filter=list(range(19)),max_eps=1e
 
         return eps,OP,OP2
         
-
-parser = argparse.ArgumentParser()
-parser.add_argument('Path', type=str , help='Path to Dataset')
-parser.add_argument('--SNR',type=list, default = list(range(19)), help='SNR Filter' )
-parser.add_argument('--VIBPath',type=str, default = None, help='VIB Model Path' )
-parser.add_argument('--CNNPath',type=str, default = None, help='CNN Model Path' )
-parser.add_argument('--max_eps', type=float, default = 1e-3, help='Maximum EPSilon' )   
-args = parser.parse_args()
-
-VIB = tf.keras.models.load_model(args.VIBPath)
-CNN = tf.keras.models.load_model(args.CNNPath)
-eps,x,y = AdversarialCompare(args.PATH, VIB,CNN,args.SNR,args.max_eps)
-plt.plot(eps,x,label="VIB")
-plt.plot(eps,y, label="CNN")
-plt.xlabel("Epsilon")
-plt.ylabel("Accuracy")
-plt.legend()
-plt.title("FGSM")
-plt.show()
