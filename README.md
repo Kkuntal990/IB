@@ -1,2 +1,3 @@
 # IB
-Dataset link https://github.com/radioML/dataset
+Dataset info link https://github.com/radioML/dataset
+SNR range == [-20, 20, 2]
