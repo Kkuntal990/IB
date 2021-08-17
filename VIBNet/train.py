@@ -15,7 +15,7 @@ parser.add_argument('--Prior_Mean',type=float, default = 0, help='Mean of Prior'
 parser.add_argument('--Prior_Sigma',type=float, default = 1.0, help='Sigma of Prior')
 parser.add_argument("--dropout", type=float, default=0.5, help='DropoutRatio')
 parser.add_argument("--loadpath", type=str, default=None, help='Load Model Path')
-parser.add_argument("--savepath", type=str, default="checkpoint", help='Save Model Path')
+parser.add_argument("--savepath", type=str, default="VIBNet/checkpoint/default", help='Save Model Path')
 parser.add_argument("--model_type", type=str, default="VIB", help='Model Type \n1.VIB - VIBNet \n2.CNN - CNN')
 args = parser.parse_args()
 
@@ -49,6 +49,6 @@ else:
 
 checkpoint = tf.keras.callbacks.ModelCheckpoint(args.savepath, monitor='val_categorical_accuracy', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
-history = model.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epochs, batch_size=args.BatchSize, callbacks=callbacks_list)
-# model.predict(X_test)
-# model.save(args.savepath)
+model.fit(X_train,Y_train,validation_data=(X_test, Y_test), epochs=args.epochs, batch_size=args.BatchSize, callbacks=[])
+model.predict(X_test)
+model.save(args.savepath)
