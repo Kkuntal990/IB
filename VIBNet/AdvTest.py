@@ -38,8 +38,9 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
 
     classes = mods
     print(in_shp)
-    eps = [1e-4, 5*1e-4, 1e-3, 5*1e-3, 8*1e-3,
-            1e-2, 2*1e-2, 0.03, 0.04, 5*1e-2, 0.65, 8*1e-2, 1e-1, 0.5]
+    #eps = [1e-4, 5*1e-4, 1e-3, 5*1e-3, 8*1e-3,
+    #        1e-2, 2*1e-2, 0.03, 0.04, 5*1e-2, 0.65, 8*1e-2, 1e-1, 0.5]
+    eps = [0.05]
     OP = []
 
     for __ in eps:
