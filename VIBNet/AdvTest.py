@@ -47,7 +47,7 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
         tmp = []
         for i in range(times):
             X_Adv = projected_gradient_descent(
-                VIB, X_test, __, __/ratio, 40, np.inf)
+                VIB, X_test, __, __/ratio, 40, np.inf, rand_init=1.0)
             Y_pred = np.argmax(VIB(X_Adv), axis=1)
             Y_test2 = np.argmax(Y_test, axis=1)
             co = 0
@@ -64,7 +64,7 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
         tmp = []
         for i in range(times):
             X_Adv = projected_gradient_descent(
-                CNN, X_test, __, __/ratio, 40, np.inf)
+                CNN, X_test, __, __/ratio, 40, np.inf, rand_init=1.0)
             Y_pred = np.argmax(CNN(X_Adv), axis=1)
             Y_test2 = np.argmax(Y_test, axis=1)
             co = 0
