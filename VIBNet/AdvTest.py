@@ -41,7 +41,7 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
     #eps = [1e-4, 5*1e-4, 1e-3, 5*1e-3, 8*1e-3,
     #        1e-2, 2*1e-2, 0.03, 0.04, 5*1e-2, 0.65, 8*1e-2, 1e-1, 0.5]
     eps = [0.05]
-    OP = []
+    OP = [], OP3 =[], OP4 = []
 
     for __ in eps:
         tmp = []
@@ -57,6 +57,7 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
             print(co/len(X_test))
             tmp.append(co/len(X_test))
         OP.append(np.min(tmp))
+        OP3.append(np.max(tmp))
 
     OP2 = []
     for __ in eps:
@@ -73,5 +74,6 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
             print(co/len(X_test))
             tmp.append(co/len(X_test))
         OP2.append(np.min(tmp))
+        OP4.append(np.max(tmp))
 
-    return eps, OP, OP2
+    return eps, OP, OP2, OP3, OP4
