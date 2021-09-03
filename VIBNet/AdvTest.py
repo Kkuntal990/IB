@@ -1,12 +1,34 @@
 from cleverhans.tf2.attacks.projected_gradient_descent import projected_gradient_descent
 from cleverhans.tf2.attacks.fast_gradient_method import fast_gradient_method
+import easydict
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 import tensorflow as tf
 from tensorflow_probability import distributions as ds
 from load_dataset import load_data
+from easydict import EasyDict
 
+
+def test_adv(model1, model2, times=10, ratio=20, eps =[], data: EasyDict = EasyDict(train=[], test=[])):
+    VIB = tf.keras.models.load_model(model1)
+    CNN = tf.keras.models.load_model(model2)
+    test_acc_VIB = tf.metrics.SparseCategoricalAccuracy()
+    test_acc_CNN = tf.metrics.SparseCategoricalAccuracy()
+    for x,y in data.test:
+        y_A = 0
+        y_B = 0
+        for __ in eps:
+            x_a = projected_gradient_descent(
+                VIB, x, __, __/ratio, 60, np.inf, rand_init=1.0)
+            x_b = projected_gradient_descent(
+                CNN, x, __, __/ratio, 60, np.inf, rand_init=1.0)
+            y_a = VIB(x_a)
+            y_b = VIB(y_b)
+        test_acc_VIB(y, y_a)
+        test_acc_CNN(y, y_b)
+    return test_acc_VIB.result()*100, test_acc_CNN.result() 
+        
 
 def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps=1e-3, times=10, ratio=20):
 
