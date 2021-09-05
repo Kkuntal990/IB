@@ -10,24 +10,25 @@ from load_dataset import load_data
 from easydict import EasyDict
 
 
-def test_adv(model1, model2, times=10, ratio=20, eps =[], data: EasyDict = EasyDict(train=[], test=[])):
-    VIB = tf.keras.models.load_model(model1)
-    CNN = tf.keras.models.load_model(model2)
-    test_acc_VIB = tf.metrics.SparseCategoricalAccuracy()
-    test_acc_CNN = tf.metrics.SparseCategoricalAccuracy()
+def test_adv(models = [], metrics = [],eps = 0.02, ratio=20, data: EasyDict = EasyDict(train=[], test=[])):
+    
+    progress_bar_test = tf.keras.utils.Progbar(data.test.shape[0])
     for x,y in data.test:
-        y_A = 0
-        y_B = 0
-        for __ in eps:
+        y_A = 1
+        y_B = 1
+        
+        for i in range(models):
             x_a = projected_gradient_descent(
-                VIB, x, __, __/ratio, 60, np.inf, rand_init=1.0)
-            x_b = projected_gradient_descent(
-                CNN, x, __, __/ratio, 60, np.inf, rand_init=1.0)
-            y_a = VIB(x_a)
-            y_b = VIB(y_b)
-        test_acc_VIB(y, y_a)
-        test_acc_CNN(y, y_b)
-    return test_acc_VIB.result()*100, test_acc_CNN.result() 
+                models[i], x, eps, eps/ratio, 50, np.inf, rand_init=1.0)
+            y_a = models[i](x_a)
+            metrics[i](np.argmax(y), y_a)
+        progress_bar_test.add(x.shape[0])
+    result = []
+    for m in metrics:
+        result.append(m.result()*100)
+        m.reset_state()
+
+    return result
         
 
 def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps=1e-3, times=10, ratio=20):
@@ -35,31 +36,25 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
     VIB = tf.keras.models.load_model(model1)
     CNN = tf.keras.models.load_model(model2)
     X_train, X_test, Y_train, Y_test, mods = load_data(PATH, SNR_Filter)
+    train_data = (X_train, Y_train)
+    test_data = (X_test, Y_test)
     in_shp = list(X_train.shape[1:])
 
-    print(X_train.shape, X_test.shape)
-    print(Y_train.shape, Y_test.shape)
+    # print(X_train.shape, X_test.shape)
+    # print(Y_train.shape, Y_test.shape)
 
+    test_acc_VIB = tf.metrics.SparseCategoricalAccuracy()
+    test_acc_CNN = tf.metrics.SparseCategoricalAccuracy()
     #printing acc of VIB
-    Y_pred = np.argmax(VIB(X_test), axis=1)
-    Y_test2 = np.argmax(Y_test, axis=1)
-    co = 0
-    for i in range(len(X_test)):
-        if(Y_test2[i] == Y_pred[i]):
-            co += 1
-    print(co/len(X_test))
+    test_acc_VIB(np.argmax(Y_test, axis=1), VIB(X_test))
+    test_acc_CNN(np.argmax(Y_test, axis=1), CNN(X_test))
+    print("VIB accuracy %f" %(test_acc_VIB.result()*100))
+    print("CNN accuracy %f" % (test_acc_CNN.result()*100))
 
-    #getting accuracy of CNN
-    Y_pred = np.argmax(CNN(X_test), axis=1)
-    Y_test2 = np.argmax(Y_test, axis=1)
-    co = 0
-    for i in range(len(X_test)):
-        if(Y_test2[i] == Y_pred[i]):
-            co += 1
-    print(co/len(X_test))
+    test_acc_CNN.reset_state()
+    test_acc_VIB.reset_state()
 
-    classes = mods
-    print(in_shp)
+
     #eps = [1e-4, 5*1e-4, 1e-3, 5*1e-3, 8*1e-3,
     #        1e-2, 2*1e-2, 0.03, 0.04, 5*1e-2, 0.65, 8*1e-2, 1e-1, 0.5]
     eps = [0.05]
