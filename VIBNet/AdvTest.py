@@ -12,7 +12,7 @@ from easydict import EasyDict
 
 def test_adv(models = [], metrics = [],ep = 0.02, ratio=20, X_test=[], Y_test =[], times = 10):
     
-    progress_bar_test = tf.keras.utils.Progbar(data[0].shape[0])
+    progress_bar_test = tf.keras.utils.Progbar(X_test.shape[0])
     print(data[0].shape)
     for i in range(X_test.shape[0]):
         x = X_test[i]
