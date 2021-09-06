@@ -10,7 +10,7 @@ from load_dataset import load_data
 from easydict import EasyDict
 
 
-def test_adv(models = [], metrics = [],eps = 0.02, ratio=20, data: EasyDict = EasyDict(train=[], test=[])):
+def test_adv(models = [], metrics = [],ep = 0.02, ratio=20, data = (), times = 10):
     
     progress_bar_test = tf.keras.utils.Progbar(data.test.shape[0])
     for x,y in data.test:
@@ -19,7 +19,7 @@ def test_adv(models = [], metrics = [],eps = 0.02, ratio=20, data: EasyDict = Ea
         
         for i in range(models):
             x_a = projected_gradient_descent(
-                models[i], x, eps, eps/ratio, 50, np.inf, rand_init=np.random.normal(size=1))
+                models[i], x, ep, ep/ratio, 50, np.inf, rand_init=np.random.normal(size=1))
             y_a = models[i](x_a)
             metrics[i](np.argmax(y), y_a)
         progress_bar_test.add(x.shape[0])
@@ -37,8 +37,7 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
     VIB = tf.keras.models.load_model(model1)
     CNN = tf.keras.models.load_model(model2)
     X_train, X_test, Y_train, Y_test, mods = load_data(PATH, SNR_Filter)
-    train_data = (X_train, Y_train)
-    test_data = (X_test, Y_test)
+    
     in_shp = list(X_train.shape[1:])
 
     # print(X_train.shape, X_test.shape)
@@ -55,7 +54,6 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
     test_acc_CNN.reset_state()
     test_acc_VIB.reset_state()
 
-
     #eps = [1e-4, 5*1e-4, 1e-3, 5*1e-3, 8*1e-3,
     #        1e-2, 2*1e-2, 0.03, 0.04, 5*1e-2, 0.65, 8*1e-2, 1e-1, 0.5]
     eps = [0.05]
@@ -64,20 +62,9 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
     OP4 = []
 
     for __ in eps:
-        tmp = []
-        for i in range(times):
-            X_Adv = projected_gradient_descent(
-                VIB, X_test, __, __/ratio, 40, np.inf, rand_init=1.0)
-            Y_pred = np.argmax(VIB(X_Adv), axis=1)
-            Y_test2 = np.argmax(Y_test, axis=1)
-            co = 0
-            for i in range(len(X_test)):
-                if(Y_test2[i] == Y_pred[i]):
-                    co += 1
-            print(co/len(X_test))
-            tmp.append(co/len(X_test))
-        OP.append(np.min(tmp))
-        OP3.append(np.max(tmp))
+        res = test_adv([VIB, CNN], [test_acc_VIB, test_acc_CNN], __, 20, (X_test, Y_test), 10)
+        OP.append(res[0])
+        OP3.append(res[1])
 
     OP2 = []
     for __ in eps:
