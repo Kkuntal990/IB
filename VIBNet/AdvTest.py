@@ -19,11 +19,12 @@ def test_adv(models = [], metrics = [],eps = 0.02, ratio=20, data: EasyDict = Ea
         
         for i in range(models):
             x_a = projected_gradient_descent(
-                models[i], x, eps, eps/ratio, 50, np.inf, rand_init=1.0)
+                models[i], x, eps, eps/ratio, 50, np.inf, rand_init=np.random.normal(size=1))
             y_a = models[i](x_a)
             metrics[i](np.argmax(y), y_a)
         progress_bar_test.add(x.shape[0])
     result = []
+
     for m in metrics:
         result.append(m.result()*100)
         m.reset_state()
