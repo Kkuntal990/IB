@@ -13,10 +13,7 @@ from easydict import EasyDict
 def test_adv(models = [], metrics = [],ep = 0.02, ratio=20, data = (), times = 10):
     
     progress_bar_test = tf.keras.utils.Progbar(data.test.shape[0])
-    for x,y in data.test:
-        y_A = 1
-        y_B = 1
-        
+    for x,y in data:
         for i in range(models):
             x_a = projected_gradient_descent(
                 models[i], x, ep, ep/ratio, 50, np.inf, rand_init=np.random.normal(size=1))
