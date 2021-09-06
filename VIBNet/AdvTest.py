@@ -10,11 +10,13 @@ from load_dataset import load_data
 from easydict import EasyDict
 
 
-def test_adv(models = [], metrics = [],ep = 0.02, ratio=20, data = (), times = 10):
+def test_adv(models = [], metrics = [],ep = 0.02, ratio=20, X_test=[], Y_test =[], times = 10):
     
     progress_bar_test = tf.keras.utils.Progbar(data[0].shape[0])
     print(data[0].shape)
-    for (x,y) in data:
+    for i in range(X_test.shape[0]):
+        x = X_test[i]
+        y = Y_test[i]
         for i in range(models):
             x_a = projected_gradient_descent(
                 models[i], x, ep, ep/ratio, 50, np.inf, rand_init=np.random.normal(size=1))
@@ -39,7 +41,7 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
 
     test_acc_VIB = tf.metrics.SparseCategoricalAccuracy()
     test_acc_CNN = tf.metrics.SparseCategoricalAccuracy()
-    
+
     #printing acc of VIB
     test_acc_VIB(np.argmax(Y_test, axis=1), VIB(X_test))
     test_acc_CNN(np.argmax(Y_test, axis=1), CNN(X_test))
@@ -57,7 +59,7 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
 
 
     for __ in eps:
-        res = test_adv(models=[VIB, CNN], metrics=[test_acc_VIB, test_acc_CNN], ep =__, ratio=20, data = (X_test, Y_test), times=10)
+        res = test_adv(models=[VIB, CNN], metrics=[test_acc_VIB, test_acc_CNN], ep =__, ratio=20, X_test=X_test, Y_test=Y_test, times=10)
         print('At \u03B5 = %f \n VIB : %f \n CNN : %f' % (__, res[0], res[1]))
         OP.append(res[0])
         OP2.append(res[1])
