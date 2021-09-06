@@ -55,29 +55,15 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
     #        1e-2, 2*1e-2, 0.03, 0.04, 5*1e-2, 0.65, 8*1e-2, 1e-1, 0.5]
     eps = [0.05]
     OP = []
-    OP3 =[]
-    OP4 = []
+    OP2 =[]
+
 
     for __ in eps:
         res = test_adv([VIB, CNN], [test_acc_VIB, test_acc_CNN], __, 20, (X_test, Y_test), 10)
+        print('At \u03B5 = %f \n VIB : %f \n CNN : %f' % (__, res[0], res[1]))
         OP.append(res[0])
-        OP3.append(res[1])
+        OP2.append(res[1])
 
-    OP2 = []
-    for __ in eps:
-        tmp = []
-        for i in range(times):
-            X_Adv = projected_gradient_descent(
-                CNN, X_test, __, __/ratio, 40, np.inf, rand_init=1.0)
-            Y_pred = np.argmax(CNN(X_Adv), axis=1)
-            Y_test2 = np.argmax(Y_test, axis=1)
-            co = 0
-            for i in range(len(X_test)):
-                if(Y_test2[i] == Y_pred[i]):
-                    co += 1
-            print(co/len(X_test))
-            tmp.append(co/len(X_test))
-        OP2.append(np.min(tmp))
-        OP4.append(np.max(tmp))
 
-    return eps, OP, OP2, OP3, OP4
+
+    return eps, OP, OP2
