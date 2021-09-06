@@ -5,19 +5,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 import tensorflow as tf
+from tensorflow.keras import metrics
 from tensorflow_probability import distributions as ds
 from load_dataset import load_data
 from easydict import EasyDict
 
 
-def test_adv(models = [], metrics = [],ep = 0.02, ratio=20, X_test=[], Y_test =[], times = 10):
-    
+def test_adv(models=[], metrics=[], ep=0.02, ratio=20, X_test=[], Y_test=[], times=10):
+
     progress_bar_test = tf.keras.utils.Progbar(X_test.shape[0])
-    print(data[0].shape)
     for i in range(X_test.shape[0]):
         x = X_test[i]
         y = Y_test[i]
-        for i in range(models):
+        for i in range(len(models)):
             x_a = projected_gradient_descent(
                 models[i], x, ep, ep/ratio, 50, np.inf, rand_init=np.random.normal(size=1))
             y_a = models[i](x_a)
@@ -30,7 +30,7 @@ def test_adv(models = [], metrics = [],ep = 0.02, ratio=20, X_test=[], Y_test =[
         m.reset_state()
 
     return result
-        
+
 
 def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps=1e-3, times=10, ratio=20):
 
@@ -38,32 +38,46 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
     CNN = tf.keras.models.load_model(model2)
     X_train, X_test, Y_train, Y_test, mods = load_data(PATH, SNR_Filter)
     
-
     test_acc_VIB = tf.metrics.SparseCategoricalAccuracy()
     test_acc_CNN = tf.metrics.SparseCategoricalAccuracy()
-
+    models = [VIB, CNN]
     #printing acc of VIB
     test_acc_VIB(np.argmax(Y_test, axis=1), VIB(X_test))
     test_acc_CNN(np.argmax(Y_test, axis=1), CNN(X_test))
-    print("VIB accuracy %f" %(test_acc_VIB.result()*100))
+    print("VIB accuracy %f" % (test_acc_VIB.result()*100))
     print("CNN accuracy %f" % (test_acc_CNN.result()*100))
 
     test_acc_CNN.reset_state()
     test_acc_VIB.reset_state()
-
+    metrics = [test_acc_VIB, test_acc_CNN]
     #eps = [1e-4, 5*1e-4, 1e-3, 5*1e-3, 8*1e-3,
     #        1e-2, 2*1e-2, 0.03, 0.04, 5*1e-2, 0.65, 8*1e-2, 1e-1, 0.5]
+
+    
+    
     eps = [0.05]
     OP = []
-    OP2 =[]
+    OP2 = []
 
+    for ep in eps:
+        progress_bar_test = tf.keras.utils.Progbar(X_test.shape[0])
+        for i in range(X_test.shape[0]):
+            x = X_test[i]
+            y = Y_test[i]
+            for i in range(len(models)):
+                x_a = projected_gradient_descent(
+                    models[i], x, ep, ep/ratio, 50, np.inf, rand_init=np.random.normal(size=1))
+                y_a = models[i](x_a)
+                metrics[i](np.argmax(y), y_a)
+            progress_bar_test.add(x.shape[0])
+        result = []
 
-    for __ in eps:
-        res = test_adv(models=[VIB, CNN], metrics=[test_acc_VIB, test_acc_CNN], ep =__, ratio=20, X_test=X_test, Y_test=Y_test, times=10)
-        print('At \u03B5 = %f \n VIB : %f \n CNN : %f' % (__, res[0], res[1]))
-        OP.append(res[0])
-        OP2.append(res[1])
-
-
+        for m in metrics:
+            result.append(m.result()*100)
+            m.reset_state()
+        print('At \u03B5 = %f \n VIB : %f \n CNN : %f' %
+              (ep, result[0], result[1]))
+        OP.append(result[0])
+        OP2.append(result[1])
 
     return eps, OP, OP2

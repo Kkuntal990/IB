@@ -8,7 +8,7 @@ def to_onehot(yy):
         yy1[np.arange(len(yy)), yy] = 1
         return yy1
 
-def load_data(PATH, SNR_Filter=list(range(21))):
+def load_data(PATH, SNR_Filter=list(range(21)), fraction=1):
     with open(PATH, 'rb') as xd1:  
         Xd = pickle.load(xd1, encoding='latin1')  # , encoding='latin1'
         snrs, mods = map(lambda j: sorted(
@@ -42,4 +42,4 @@ def load_data(PATH, SNR_Filter=list(range(21))):
     trainy = list(map(lambda x: mods.index(lbl[x][0]), train_idx))
     Y_train = to_onehot(trainy)
     Y_test = to_onehot(list(map(lambda x: mods.index(lbl[x][0]), test_idx2)))
-    return X_train, X_test, Y_train, Y_test, mods
+    return X_train[:fraction*X_train.shape[0]], X_test[:fraction*X_train.shape[0]], Y_train[:fraction*X_train.shape[0]], Y_test[:fraction*X_train.shape[0]], mods
