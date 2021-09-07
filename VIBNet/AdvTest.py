@@ -18,17 +18,10 @@ def test_adv(models=[], metrics=[], ep=0.02, ratio=20, X_test=[], Y_test=[], tim
         y = Y_test[i]
         x = np.expand_dims(x, axis=0)
         for j in range(len(models)):
-            y_A = None
-            idx = np.argmax(y)
-            ans = 1
-            for _ in range(times):
-                x_a = projected_gradient_descent(
-                    models[j], x, ep, ep/ratio, 50, np.inf, rand_init=np.random.normal(size=1))
-                y_a = models[j](x_a)
-                if y_a[idx] <= ans:
-                    y_A = y_a
-
-            metrics[j](np.argmax(y), y_A)
+            x_a = projected_gradient_descent(
+                models[j], x, ep, ep/ratio, 50, np.inf, rand_init=np.random.normal(size=1))
+            y_a = models[j](x_a)
+            metrics[j](np.argmax(y), y_a)
         progress_bar_test.add(x.shape[0])
     result = []
 
@@ -60,14 +53,15 @@ def AdversarialCompare(PATH, model1, model2, SNR_Filter=list(range(19)), max_eps
     #eps = [1e-4, 5*1e-4, 1e-3, 5*1e-3, 8*1e-3,
     #        1e-2, 2*1e-2, 0.03, 0.04, 5*1e-2, 0.65, 8*1e-2, 1e-1, 0.5]
 
-    eps = [0.05]
+    eps = [0.0001, 0.0007, 0.002, 0.007, 0.01, 0.03, 0.07]
     OP = []
     OP2 = []
 
     for __ in eps:
+        print('At \u03B5 = %f' % (__))
         res = test_adv(models=[VIB, CNN], metrics=[
                        test_acc_VIB, test_acc_CNN], ep=__, ratio=20, X_test=X_test, Y_test=Y_test, times=10)
-        print('At \u03B5 = %f \n VIB : %f \n CNN : %f' % (__, res[0], res[1]))
+        print(' \n VIB : %f \n CNN : %f' % (res[0], res[1]))
         OP.append(res[0])
         OP2.append(res[1])
 
