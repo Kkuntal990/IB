@@ -18,10 +18,18 @@ def test_adv(models=[], metrics=[], ep=0.02, ratio=20, X_test=[], Y_test=[], tim
         y = Y_test[i]
         x = np.expand_dims(x, axis=0)
         for j in range(len(models)):
-            x_a = projected_gradient_descent(
-                models[j], x, ep, ep/ratio, 50, np.inf, rand_init=np.random.normal(size=1))
-            y_a = models[j](x_a)
-            metrics[j](np.argmax(y), y_a)
+            y_A = -1
+            idx = 1
+            ans = 1
+            for _ in range(times):
+                x_a = projected_gradient_descent(
+                    models[j], x, ep, ep/ratio, 50, np.inf, rand_init=1.0)
+                y_a = models[j](x_a)
+                if ans >= y_a[idx]:
+                    ans = y_a[idx]
+                    y_A = y_a
+
+            metrics[j](np.argmax(y), y_A)
         progress_bar_test.add(x.shape[0])
     result = []
 
